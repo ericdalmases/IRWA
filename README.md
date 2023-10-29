@@ -1,6 +1,6 @@
 # Tweet Data Analysis in Google Collab
 
-```
+
 Welcome to the Tweet Data Analysis project! This repository contains Python code for analyzing tweet data within a Google Colab notebook. Follow these step-by-step instructions to execute the code successfully and customize your analysis options.
 
 The procedure for executing the code is the same for all the deliverables of the project so far.
@@ -56,4 +56,3 @@ Visualizations, such as word clouds and graphs, will be displayed within the not
 Any files or data generated during the analysis will be saved in your Google Drive and made accessible within the notebook.
 
 By following these steps, you can seamlessly run the provided code for tweet data analysis in Google Colab while tailoring it to your specific data and preferences.
-```
