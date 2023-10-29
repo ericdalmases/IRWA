@@ -1,7 +1,6 @@
 # How to execute the code of the project
 
-
-Welcome to the Tweet Data Analysis project! This repository contains Python code for analyzing tweet data within a Google Colab notebook. Follow these step-by-step instructions to execute the code successfully and customize your analysis options.
+Welcome to the our IRWA project! This repository contains all the code used to analyze the results for the reports of the project. Follow these step-by-step instructions to execute the code successfully and customize your analysis options.
 
 The procedure for executing the code is the same for all the deliverables of the project so far.
 
