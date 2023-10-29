@@ -5,7 +5,7 @@ Welcome to the Tweet Data Analysis project! This repository contains Python code
 
 The procedure for executing the code is the same for all the deliverables of the project so far.
 
-**Getting Started**
+## **Getting Started**
 
 1. **Access Google Colab:**
 
@@ -15,7 +15,7 @@ Begin by opening Google Colab.
 
 In this repository, you will find a Jupyter notebook. Open it by saving it to your drive and simply clicking on the notebook file.
 
-**Configuring Your Data**
+## **Configuring Your Data**
 
 1. **Customize Data Paths:**
 
@@ -27,15 +27,13 @@ plt.savefig("/content/drive/…/WordCloud1.jpg")
 
 plt.savefig("/content/drive/…/WordCloud2.jpg")
 
-# ...
-
 plt.savefig("/content/drive/…/tokernsxtweet.jpg", bbox\_inches='tight')
 
-# …
+...
 
 Take into account that depending on the deliverable the data path might change, so be careful to modify them all!
 
-**Running the Analysis**
+## **Running the Analysis**
 
 1. **Mount Your Google Drive:**
 
@@ -49,7 +47,7 @@ Run the code cells one by one by clicking the "Run" button or using the keyboard
 
 Visualizations, such as word clouds and graphs, will be displayed within the notebook as specified in the code.
 
-**Accessing Your Results**
+## **Accessing Your Results**
 
 1. **Accessing Generated Files:**
 
