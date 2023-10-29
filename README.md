@@ -3,6 +3,8 @@
 ```
 Welcome to the Tweet Data Analysis project! This repository contains Python code for analyzing tweet data within a Google Colab notebook. Follow these step-by-step instructions to execute the code successfully and customize your analysis options.
 
+The procedure for executing the code is the same for all the deliverables of the project so far.
+
 **Getting Started**
 
 1. **Access Google Colab:**
@@ -30,6 +32,8 @@ plt.savefig("/content/drive/…/WordCloud2.jpg")
 plt.savefig("/content/drive/…/tokernsxtweet.jpg", bbox\_inches='tight')
 
 # …
+
+Take into account that depending on the deliverable the data path might change, so be careful to modify them all!
 
 **Running the Analysis**
 
