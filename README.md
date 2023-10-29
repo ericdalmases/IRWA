@@ -1,4 +1,4 @@
-# Tweet Data Analysis in Google Collab
+# How to execute the code of the project
 
 
 Welcome to the Tweet Data Analysis project! This repository contains Python code for analyzing tweet data within a Google Colab notebook. Follow these step-by-step instructions to execute the code successfully and customize your analysis options.
