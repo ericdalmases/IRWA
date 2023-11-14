@@ -1,0 +1,5 @@
+Faker==20.0.0
+Flask==3.0.0
+httpagentparser==1.9.5
+nltk==3.8.1
+pandas==2.1.3
