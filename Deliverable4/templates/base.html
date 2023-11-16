@@ -1,29 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {# Using Bootstrap v4.6.1 #}
-    <link rel="stylesheet" href="{{ url_for('static',filename='styles/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static',filename='styles/custom.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/custom.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
     <title>{% block page_title %}{% endblock %} - IRWA Search Engine</title>
     {% block header %}{% endblock %}
 </head>
+
 <body>
-<div class="container">
-    <div class='header text-center'>
-        <a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" width="100" alt="UPF logo"/>
-        </a>
-        <span> IRWA Search Engine </span>
+    <div class="container mt-4">
+        <div class='header text-center mb-4'>
+            <img src="{{ url_for('static', filename='logo.png') }}" width="100" alt="UPF logo" /> 
+            <span class="ml-2">IRWA Search Engine</span>
+        </div>
+
+        <nav class="navbar navbar-expand-lg navbar-light mb-4">
+            <div class="navbar-collapse">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+                        <a class="nav-link" href="/">Search</a>
+                    </li>
+                    <li class="nav-item {% if request.path == '/stats' %}active{% endif %}">
+                        <a class="nav-link" href="/stats">Statistics</a>
+                    </li>
+                    <li class="nav-item {% if request.path == '/dashboard' %}active{% endif %}">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item {% if request.path == '/sentiment' %}active{% endif %}">
+                        <a class="nav-link" href="/sentiment">Sentiment</a>
+                    </li>
+                    <!-- Add more nav items as needed -->
+                </ul>
+            </div>
+        </nav>        
+
+        <hr>
+
+        <div class='content'>
+            {% block content %}
+                base
+            {% endblock %}
+        </div>
+        <hr>
+        <div class='centered mt-4'>24952 - Information Retrieval and Web Analytics</div>
     </div>
-    <hr>
-    <div class='content'>
-        {% block content %}
-            base
-        {% endblock %}
-    </div>
-    <hr>
-    <div class='centered'> 24952 - Information Retrieval and Web Analytics</div>
-</div>
 </body>
+
 </html>

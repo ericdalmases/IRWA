@@ -1,17 +1,47 @@
 {% extends "base.html" %}
-{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock %}
+
 {% block content %}
-    <h1>Tweet information:</h1>
-    <h3>Tweet content:</h3>
-    <p>{{ output_tweet.description }}</p>
-    <h3>Hashtags:</h3>
-    <p>{{ output_tweet.hashtags }}</p>
-    <h3>Number of retweets:</h3>
-    <p>{{ output_tweet.retweets }}</p>
-    <h3>Number of likes:</h3>
-    <p>{{ output_tweet.likes }}</p>
-    <h3>Date:</h3>
-    <p>{{ output_tweet.doc_date }}</p>
-    <h3>URL:</h3>
-    <a href= {{ output_tweet.url }}>{{ output_tweet.url }}</a>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-13">
+                <div class="card shadow p-4">
+                    <h2 class="text-center mb-4">Tweet Information</h2>
+
+                    <div class="mb-3">
+                        <h5 class="info-heading">Tweet Content</h5>
+                        <p class="text-justify">{{ output_tweet.description }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5 class="info-heading">Hashtags</h5>
+                        <p>{{ output_tweet.hashtags }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5 class="info-heading">Number of Retweets</h5>
+                        <p>{{ output_tweet.retweets }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5 class="info-heading">Number of Likes</h5>
+                        <p>{{ output_tweet.likes }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5 class="info-heading">Date</h5>
+                        <p>{{ output_tweet.doc_date }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5 class="info-heading">URL</h5>
+                        <a href="{{ output_tweet.url }}" class="card-link" target="_blank">{{ output_tweet.url }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

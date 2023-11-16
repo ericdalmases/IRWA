@@ -104,8 +104,6 @@ def search_form_post():
 
 @app.route('/doc_details', methods=['GET'])
 def doc_details():
-    # getting request parameters:
-    # user = request.args.get('user')
 
     print("doc details session: ")
     print(session)
@@ -164,11 +162,13 @@ def dashboard():
         doc = ClickedDoc(doc_id, d.description, analytics_data.fact_clicks[doc_id])
         visited_docs.append(doc)
 
+    visited_docs_json = []
     # simulate sort by ranking
     visited_docs.sort(key=lambda doc: doc.counter, reverse=True)
 
-    for doc in visited_docs: print(doc)
-    return render_template('dashboard.html', visited_docs=visited_docs)
+    for doc in visited_docs: visited_docs_json.append(doc.to_json())
+
+    return render_template('dashboard.html', visited_docs=visited_docs_json)
 
 
 @app.route('/sentiment')

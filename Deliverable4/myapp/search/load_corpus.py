@@ -60,22 +60,12 @@ def _build_tags(row):
 
 
 def _build_url(row):
-    url = ""
-    try:
-        url = row["entities"]["url"]["urls"][0]["url"]  # tweet URL
-    except:
-        try:
-            url = row["retweeted_status"]["extended_tweet"]["entities"]["media"][0]["url"]  # Retweeted
-        except:
-            url = ""
-    return url
+    return f"https://www.twitter.com/{row['screen_name']}/status/{row['id']}",
 
 
 def _clean_hashtags_and_urls(df):
-    print(df['url'])
     df["Hashtags"] = df["hashtags"].apply(_build_tags)
     df["Url"] = df.apply(lambda row: _build_url(row), axis=1)
-    print("URL: ", df["Url"])
     df.drop(columns=["entities"], axis=1, inplace=True)
 
 
@@ -119,4 +109,4 @@ def load_tweets_as_dataframe3(json_data):
 def _row_to_doc_dict(row: pd.Series):
     _corpus[row['Id']] = Document(row['Id'], row['Tweet'][0:100], row['Tweet'], row['Date'], row['Likes'],
                                   row['Retweets'],
-                                  row['Url'], row['Hashtags'])
+                                  row['Url'][0], row['Hashtags'])

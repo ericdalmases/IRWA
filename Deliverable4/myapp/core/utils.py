@@ -38,8 +38,10 @@ def load_json_file(path):
     """
 
     # Load the file into a unique string
-    with open(path) as fp:
-        text_data = fp.readlines()[0]
+    json_tweets = []
+    # We load the json tweets line by line
+    with open(path, 'r') as file:
+        for line in file:
+            json_tweets.append(json.loads(line))
     # Parse the string into a JSON object
-    json_data = json.loads(text_data)
-    return json_data
+    return json_tweets

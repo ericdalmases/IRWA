@@ -132,14 +132,6 @@ def rank_documents(terms, docs, index, idf, tf, title_index):
 
     doc_scores=[[np.dot(curDocVec, query_vector), doc] for doc, curDocVec in doc_vectors.items() ]
     doc_scores.sort(reverse=True)
-    result_docs = [x[1] for x in doc_scores]
-    scores = [x[0] for x in doc_scores]
-    #print document titles instead if document id's
-    if len(result_docs) == 0:
-        print("No results found, try again")
-        query = input()
-        docs = search_tf_idf(query, index)
-    #print ('\n'.join(result_docs), '\n')
     return doc_scores
 
 def search_tf_idf(query, index, idf, tf, title_index):
