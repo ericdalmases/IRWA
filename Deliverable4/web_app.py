@@ -11,6 +11,7 @@ from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
 from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
+from myapp.search.algorithms import create_index_tfidf
 
 
 # *** for using method to_json in objects ***
@@ -31,8 +32,6 @@ app.secret_key = 'afgsreg86sr897b6st8b76va8er76fcs6g8d7'
 # open browser dev tool to see the cookies
 app.session_cookie_name = 'IRWA_SEARCH_ENGINE'
 
-# instantiate our search engine
-search_engine = SearchEngine()
 
 # instantiate our in memory persistence
 analytics_data = AnalyticsData()
@@ -43,12 +42,24 @@ full_path = os.path.realpath(__file__)
 path, filename = os.path.split(full_path)
 # print(path + ' --> ' + filename + "\n")
 # load documents corpus into memory.
-file_path = path + "/data/tweets.json"
+file_path = path + "/data/tweets_test.json"
 
 # file_path = "../../tweets-data-who.json"
 corpus = load_corpus(file_path)
 print("loaded corpus. first elem:", list(corpus.values())[0])
 
+
+print("Creating index...")
+index, tf, df, idf, title_index = create_index_tfidf(corpus, len(corpus))
+print("Index created")
+# instantiate our search engine
+search_engine = SearchEngine(
+    corpus=corpus,
+    index=index,
+    tf=tf,
+    idf=idf,
+    title_index = title_index
+)
 
 # Home URL "/"
 @app.route('/')
@@ -72,6 +83,7 @@ def index():
     return render_template('index.html', page_title="Welcome")
 
 
+
 @app.route('/search', methods=['POST'])
 def search_form_post():
     search_query = request.form['search-query']
@@ -80,7 +92,7 @@ def search_form_post():
 
     search_id = analytics_data.save_query_terms(search_query)
 
-    results = search_engine.search(search_query, search_id, corpus)
+    results = search_engine.search(search_query, search_id)
 
     found_count = len(results)
     session['last_found_count'] = found_count
@@ -103,7 +115,7 @@ def doc_details():
     print("recovered var from session:", res)
 
     # get the query string parameters from request
-    clicked_doc_id = request.args["id"]
+    clicked_doc_id = int(request.args["id"])
     p1 = int(request.args["search_id"])  # transform to Integer
     p2 = int(request.args["param2"])  # transform to Integer
     print("click in id={}".format(clicked_doc_id))
@@ -115,8 +127,10 @@ def doc_details():
         analytics_data.fact_clicks[clicked_doc_id] = 1
 
     print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
+    output_tweet = corpus[clicked_doc_id]
+    print(output_tweet)
 
-    return render_template('doc_details.html')
+    return render_template('doc_details.html', output_tweet=output_tweet, page_title=f"Details of {output_tweet.title}")
 
 
 @app.route('/stats', methods=['GET'])

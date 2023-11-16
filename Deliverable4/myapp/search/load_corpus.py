@@ -2,6 +2,7 @@ import pandas as pd
 
 from myapp.core.utils import load_json_file
 from myapp.search.objects import Document
+from myapp.search.algorithms import search_in_corpus
 
 _corpus = {}
 
@@ -39,7 +40,7 @@ def _load_corpus_as_dataframe(path):
 
 
 def _load_tweets_as_dataframe(json_data):
-    data = pd.DataFrame(json_data).transpose()
+    data = pd.DataFrame(json_data)
     # parse entities as new columns
     data = pd.concat([data.drop(['entities'], axis=1), data['entities'].apply(pd.Series)], axis=1)
     # parse user data as new columns and rename some columns to prevent duplicate column names
@@ -71,9 +72,10 @@ def _build_url(row):
 
 
 def _clean_hashtags_and_urls(df):
+    print(df['url'])
     df["Hashtags"] = df["hashtags"].apply(_build_tags)
     df["Url"] = df.apply(lambda row: _build_url(row), axis=1)
-    # df["Url"] = "TODO: get url from json"
+    print("URL: ", df["Url"])
     df.drop(columns=["entities"], axis=1, inplace=True)
 
 
