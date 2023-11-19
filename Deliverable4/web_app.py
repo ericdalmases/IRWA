@@ -6,6 +6,7 @@ import httpagentparser  # for getting the user agent as json
 import nltk
 from flask import Flask, render_template, session
 from flask import request
+import pickle
 
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
@@ -50,7 +51,9 @@ print("loaded corpus. first elem:", list(corpus.values())[0])
 
 
 print("Creating index...")
-index, tf, df, idf, title_index = create_index_tfidf(corpus, len(corpus))
+#index, tf, df, idf, title_index = create_index_tfidf(corpus, len(corpus))
+with open('saved_steps.pkl', 'rb') as file:
+    index, tf, df, idf, title_index = pickle.load(file)
 print("Index created")
 # instantiate our search engine
 search_engine = SearchEngine(
