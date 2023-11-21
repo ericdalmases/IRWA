@@ -12,13 +12,22 @@ class AnalyticsData:
     fact_clicks = dict([])
 
     # statistics table 2
-    fact_two = dict([])
+    fact_queries = []
 
     # statistics table 3
     fact_three = dict([])
 
     def save_query_terms(self, terms: str) -> int:
-        print(self)
+        # Check if terms is already in the list
+        for idx, (query, count) in enumerate(self.fact_queries):
+            if query == terms:
+                self.fact_queries[idx] = (query, count + 1)
+                break
+        else:
+            # If terms is not in the list, add it
+            self.fact_queries.append((terms, 1))
+
+        self.fact_queries.sort(key=lambda x: x[1], reverse=True)
         return random.randint(0, 100000)
 
 

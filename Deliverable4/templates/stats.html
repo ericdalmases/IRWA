@@ -10,6 +10,26 @@
                 <span class="text-dark"> ({{ doc.count }} visits) </span> — id: {{ doc.id }} — {{ doc.description }}
             </div>
         </div>
-        <hr>
     {% endfor %}
+    <hr>
+
+    <h4>Searched queries:</h4>
+    {% for query in queries %}
+    <div class="pb-3">
+        <div class="">
+            <p>{{ query[0] }}: {{ query[1] }}</p>
+        </div>
+    </div>
+    {% endfor %}
+    <hr>
+
+
+    <h4>User information:</h4>
+    <p>Browser: {{ browser }}</p>
+    <p>Operating System: {{ os }}</p>
+    <p>Time of the Day: {{ current_time }}</p>
+    <p>Date: {{ current_date }}</p>
+    <p>IP Address: {{ ip_address }}</p>
+    <p>Country: {{ country }}</p>
+    <p>City: {{ city }}</p>
 {% endblock %}

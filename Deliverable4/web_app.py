@@ -7,6 +7,8 @@ import nltk
 from flask import Flask, render_template, session
 from flask import request
 import pickle
+import requests
+from datetime import datetime
 
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
@@ -142,7 +144,6 @@ def stats():
     """
 
     docs = []
-    # ### Start replace with your code ###
 
     for doc_id in analytics_data.fact_clicks:
         row: Document = corpus[int(doc_id)]
@@ -152,8 +153,44 @@ def stats():
 
     # simulate sort by ranking
     docs.sort(key=lambda doc: doc.count, reverse=True)
-    return render_template('stats.html', clicks_data=docs)
-    # ### End replace with your code ###
+
+    browser = request.headers.get('User-Agent')
+    os = request.user_agent.platform
+
+    current_datetime = datetime.now()
+    # Get current time of the day
+    current_time = current_datetime.strftime('%H:%M:%S')
+
+    # Get current date
+    current_date = current_datetime.strftime('%d/%m/%Y')
+    print(request.remote_addr)
+    ip_address = "Unknown"
+    country = "Unknown"
+    city = "Unknown"
+
+    # Get IP address using an external service
+    try:
+        ip_info = requests.get('https://api64.ipify.org?format=json').json()
+        ip_address = ip_info['ip']
+        country = ip_info['location']['country']
+        city = ip_info['location']['city']
+    except Exception as e:
+        print('Error fetching IP information:', e)
+
+    print(analytics_data.fact_queries)
+
+    return render_template(
+        'stats.html', 
+        clicks_data=docs,
+        queries= analytics_data.fact_queries,
+        browser = browser,
+        os = os,
+        current_time = current_time,
+        current_date = current_date,
+        ip_address = ip_address,
+        country = country,
+        city = city
+        )
 
 
 @app.route('/dashboard', methods=['GET'])
