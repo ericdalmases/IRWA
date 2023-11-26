@@ -2,4 +2,4 @@
 tweets.json
 venv
 *.cpython-310.pyc
-__pycache__
+**/__pycache__/
