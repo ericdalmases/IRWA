@@ -1,32 +1,13 @@
-import random
 
-from myapp.search.objects import ResultItem, Document
-from myapp.search.algorithms import search_in_corpus
+from myapp.search.objects import ResultItem, Tweet
+from myapp.search.algorithms import search_in_corpus, search_custom, TextProcessor
 
-def build_demo_results(corpus: dict, search_id):
-    """
-    Helper method, just to demo the app
-    :return: a list of demo docs sorted by ranking
-    """
-    res = []
-    size = len(corpus)
-    ll = list(corpus.values())
-    for index in range(random.randint(0, 40)):
-        item: Document = ll[random.randint(0, size)]
-        res.append(ResultItem(item.id, item.title, item.description, item.doc_date,
-                              "doc_details?id={}&search_id={}&param2=2".format(item.id, search_id), random.random()))
+import gensim
+from gensim.models import Word2Vec, KeyedVectors
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
-    # for index, item in enumerate(corpus['Id']):
-    #     # DF columns: 'Id' 'Tweet' 'Username' 'Date' 'Hashtags' 'Likes' 'Retweets' 'Url' 'Language'
-    #     res.append(DocumentInfo(item.Id, item.Tweet, item.Tweet, item.Date,
-    #                             "doc_details?id={}&search_id={}&param2=2".format(item.Id, search_id), random.random()))
-
-    # simulate sort by ranking
-    res.sort(key=lambda doc: doc.ranking, reverse=True)
-    return res
-
-
-class SearchEngine:
+class SearchEngineTfIdf:
     """educational search engine"""
     def __init__(self, corpus, index, tf, idf, title_index):
         self.corpus = corpus
@@ -38,20 +19,84 @@ class SearchEngine:
     def search(self, search_query, search_id):
         print("Search query:", search_query)
 
-        results = []
-        ##### your code here #####
-        #results = build_demo_results(self.corpus, search_id)  # replace with call to search algorithm
-
-        doc_scores = search_in_corpus(search_query, self.corpus, self.index, self.tf, self.idf, self.title_index)
+        doc_scores = search_in_corpus(search_query, self.index, self.tf, self.idf, self.title_index)
 
         res = []
         
         for pair in doc_scores:
             docId = pair[1]
             score = pair[0]
-            item: Document = self.corpus[docId]
+            item: Tweet = self.corpus[docId]
+            res.append(ResultItem(item.id, item.title, item.description, item.doc_date,"doc_details?id={}&search_id={}&param2=2".format(item.id, search_id), score))
+        
+    
+        return res
+    
+
+class SearchEngineOurScore:
+    """educational search engine"""
+    def __init__(self, corpus, index, scores):
+        self.corpus = corpus
+        self.index = index
+        self.custom_scores = scores
+
+    def search(self, search_query, search_id):
+        print("Search query:", search_query)
+
+        doc_scores = search_custom(search_query, self.index, self.custom_scores)
+
+        res = []
+        
+        for pair in doc_scores:
+            docId = pair[1]
+            score = pair[0]
+            item: Tweet = self.corpus[docId]
             res.append(ResultItem(item.id, item.title, item.description, item.doc_date,
                                 "doc_details?id={}&search_id={}&param2=2".format(item.id, search_id), score))
         
+        return res
     
+def average_vector(tokens, model):
+    # Filter out words that are not in the vocabulary
+    tokens = [word for word in tokens if word in model.wv.key_to_index]
+
+    if len(tokens) == 0:
+        return np.zeros(model.wv.vector_size)
+
+    # Calculate the average vector for the given tokens
+    vector_sum = np.zeros(model.wv.vector_size)
+    for word in tokens:
+        vector_sum += model.wv[word]
+
+    return vector_sum / len(tokens)
+
+class SearchEngineWord2Vec:
+    """educational search engine"""
+    def __init__(self, corpus, token_tweets):
+        self.corpus = corpus
+        self.model = Word2Vec(token_tweets, min_count = 1, vector_size = 100, window = 5)
+
+    def search(self, search_query, search_id):
+        print("Search query:", search_query)
+
+        query_tokens = TextProcessor.process(search_query)
+        query_embedded = average_vector(query_tokens, self.model)
+        doc_scores = []
+        res = []
+
+        for docId in self.corpus:
+            tweet_embedded = average_vector(self.corpus[docId].description, self.model) # We compute the embedding of the tweet
+            doc_scores.append([
+                cosine_similarity(np.array(query_embedded).reshape(1, -1), np.array(tweet_embedded).reshape(1, -1))[0][0], docId])
+        
+        doc_scores = sorted(doc_scores, key=lambda x: x[0], reverse=True)[:20]
+        print(doc_scores)
+
+        for pair in doc_scores:
+            docId = pair[1]
+            score = pair[0]
+            item: Tweet = self.corpus[docId]
+            res.append(ResultItem(item.id, item.title, item.description, item.doc_date,
+                                "doc_details?id={}&search_id={}&param2=2".format(item.id, search_id), score))
+            
         return res

@@ -1,13 +1,13 @@
 import pandas as pd
 
 from myapp.core.utils import load_json_file
-from myapp.search.objects import Document
+from myapp.search.objects import Tweet
 from myapp.search.algorithms import search_in_corpus
 
 _corpus = {}
 
 
-def load_corpus(path) -> [Document]:
+def load_corpus(path) -> [Tweet]:
     """
     Load file and transform to dictionary with each document as an object for easier treatment when needed for displaying
      in results, stats, etc.
@@ -27,14 +27,22 @@ def _load_corpus_as_dataframe(path):
     json_data = load_json_file(path)
     tweets_df = _load_tweets_as_dataframe(json_data)
     _clean_hashtags_and_urls(tweets_df)
-    # Rename columns to obtain: Tweet | Username | Date | Hashtags | Likes | Retweets | Url | Language
+    # Rename columns to obtain: Tweet | Username | Date | Hashtags | Likes | Retweets | Url | Language 
     corpus = tweets_df.rename(
-        columns={"id": "Id", "full_text": "Tweet", "screen_name": "Username", "created_at": "Date",
-                 "favorite_count": "Likes",
-                 "retweet_count": "Retweets", "lang": "Language"})
-
+        columns={
+                "id": "Id", 
+                "full_text": "Tweet", 
+                "screen_name": "Username", 
+                "created_at":"Date",
+                "favorite_count": "Likes",
+                "retweet_count": "Retweets", 
+                "lang": "Language",
+                "followers_count": "User_Followers",
+                "friends_count": "User_Followed",
+                "verified": "User_Verified",
+                "statuses_count": "User_NumTweets"})
     # select only interesting columns
-    filter_columns = ["Id", "Tweet", "Username", "Date", "Hashtags", "Likes", "Retweets", "Url", "Language"]
+    filter_columns = ["Id", "Tweet", "Username", "Date", "Hashtags", "Likes", "Retweets", "Url", "Language", "User_Followers", "User_Followed", "User_Verified", "User_NumTweets"]
     corpus = corpus[filter_columns]
     return corpus
 
@@ -45,15 +53,18 @@ def _load_tweets_as_dataframe(json_data):
     data = pd.concat([data.drop(['entities'], axis=1), data['entities'].apply(pd.Series)], axis=1)
     # parse user data as new columns and rename some columns to prevent duplicate column names
     data = pd.concat([data.drop(['user'], axis=1), data['user'].apply(pd.Series).rename(
-        columns={"created_at": "user_created_at", "id": "user_id", "id_str": "user_id_str", "lang": "user_lang"})],
-                     axis=1)
+        columns={
+            "created_at": "user_created_at", 
+            "id": "user_id", 
+            "id_str": "user_id_str", 
+            "lang": "user_lang",
+            })],
+        axis=1)
     return data
 
 
 def _build_tags(row):
     tags = []
-    # for ht in row["hashtags"]:
-    #     tags.append(ht["text"])
     for ht in row:
         tags.append(ht["text"])
     return tags
@@ -107,6 +118,4 @@ def load_tweets_as_dataframe3(json_data):
 
 
 def _row_to_doc_dict(row: pd.Series):
-    _corpus[row['Id']] = Document(row['Id'], row['Tweet'][0:100], row['Tweet'], row['Date'], row['Likes'],
-                                  row['Retweets'],
-                                  row['Url'][0], row['Hashtags'])
+    _corpus[row['Id']] = Tweet(row['Id'], row['Tweet'][0:100], row['Tweet'], row['Date'], row['Likes'], row['Retweets'],row['Url'][0], row['Hashtags'], row["User_Followers"], row["User_Followed"], row["User_Verified"], row["User_NumTweets"])

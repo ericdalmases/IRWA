@@ -12,9 +12,9 @@ from datetime import datetime
 
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
-from myapp.search.objects import Document, StatsDocument
-from myapp.search.search_engine import SearchEngine
-from myapp.search.algorithms import create_index_tfidf
+from myapp.search.objects import Tweet, StatsDocument
+from myapp.search.search_engine import SearchEngineTfIdf, SearchEngineOurScore, SearchEngineWord2Vec
+from myapp.search.algorithms import TextProcessor
 
 
 # *** for using method to_json in objects ***
@@ -49,21 +49,38 @@ file_path = path + "/data/tweets_test.json"
 
 # file_path = "../../tweets-data-who.json"
 corpus = load_corpus(file_path)
-print("loaded corpus. first elem:", list(corpus.values())[0])
 
-
-print("Creating index...")
-#index, tf, df, idf, title_index = create_index_tfidf(corpus, len(corpus))
+print("Loading index prom pickle...")
 with open('saved_steps.pkl', 'rb') as file:
     index, tf, df, idf, title_index = pickle.load(file)
-print("Index created")
+print("Index loaded")
+
 # instantiate our search engine
-search_engine = SearchEngine(
+search_engine_tfidf = SearchEngineTfIdf(
     corpus=corpus,
     index=index,
     tf=tf,
     idf=idf,
     title_index = title_index
+)
+
+custom_scores = {}
+for doc_id in corpus.keys():
+  custom_scores[doc_id] = corpus[doc_id].getCustomScore()
+
+search_engine_popularity = SearchEngineOurScore(
+    corpus=corpus,
+    index=index,
+    scores=custom_scores
+)
+
+token_tweets = []
+for doc_id in corpus.keys():
+    token_tweets.append(TextProcessor.process(corpus[doc_id].description))
+
+search_engine_word2vec = SearchEngineWord2Vec(
+    corpus=corpus,
+    token_tweets=token_tweets
 )
 
 # Home URL "/"
@@ -73,7 +90,7 @@ def index():
 
     # flask server creates a session by persisting a cookie in the user's browser.
     # the 'session' object keeps data between multiple requests
-    session['some_var'] = "IRWA 2021 home"
+    session['some_var'] = "IRWA 2023 home"
 
     user_agent = request.headers.get('User-Agent')
     print("Raw user browser:", user_agent)
@@ -92,17 +109,22 @@ def index():
 @app.route('/search', methods=['POST'])
 def search_form_post():
     search_query = request.form['search-query']
-
     session['last_search_query'] = search_query
-
+    search_method = request.form['search-method']
     search_id = analytics_data.save_query_terms(search_query)
 
-    results = search_engine.search(search_query, search_id)
+    if(search_method == "TF-IDF"):
+        results = search_engine_tfidf.search(search_query, search_id)
+    elif(search_method == "Popularity based"):
+        results = search_engine_popularity.search(search_query, search_id)
+    elif((search_method == "Word2Vec")):
+        results = search_engine_word2vec.search(search_query, search_id)
+    else:
+        return
+
 
     found_count = len(results)
     session['last_found_count'] = found_count
-
-    print(session)
 
     return render_template('results.html', results_list=results, page_title="Results", found_counter=found_count)
 
@@ -146,7 +168,7 @@ def stats():
     docs = []
 
     for doc_id in analytics_data.fact_clicks:
-        row: Document = corpus[int(doc_id)]
+        row: Tweet = corpus[int(doc_id)]
         count = analytics_data.fact_clicks[doc_id]
         doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count)
         docs.append(doc)
@@ -198,7 +220,7 @@ def dashboard():
     visited_docs = []
     print(analytics_data.fact_clicks.keys())
     for doc_id in analytics_data.fact_clicks.keys():
-        d: Document = corpus[int(doc_id)]
+        d: Tweet = corpus[int(doc_id)]
         doc = ClickedDoc(doc_id, d.description, analytics_data.fact_clicks[doc_id])
         visited_docs.append(doc)
 
