@@ -229,8 +229,9 @@ def dashboard():
     visited_docs.sort(key=lambda doc: doc.counter, reverse=True)
 
     for doc in visited_docs: visited_docs_json.append(doc.to_json())
+    print(analytics_data.fact_queries)
 
-    return render_template('dashboard.html', visited_docs=visited_docs_json)
+    return render_template('dashboard.html', visited_docs=visited_docs_json, searched_queries=analytics_data.fact_queries)
 
 
 @app.route('/sentiment')

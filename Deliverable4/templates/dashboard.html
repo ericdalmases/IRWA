@@ -22,6 +22,7 @@
 
     -->
 
+
     <script>
         // 'visited_docs' is the data coming from Python code.
         // load the python list in the JS variable 'visits_list':
@@ -32,7 +33,6 @@
 
     <h5>Ranking of Visited Documents</h5>
     <canvas id="dailyVisits" width="400" height="400"></canvas>
-
 
     <script>
         // use JS map function top get just the tweet ids as labels
@@ -50,10 +50,10 @@
             }]
         };
 
-        const ctx = document.getElementById('dailyVisits').getContext('2d');
+        const ctx1 = document.getElementById('dailyVisits').getContext('2d');
 
         // This will render the chart
-        const myChart = new Chart(ctx, {
+        const myChart1 = new Chart(ctx1, {
             type: 'line',
             data: chartData1,
             options: {
@@ -79,6 +79,49 @@
         <hr>
     {% endfor %}
 
+    <script>
+        // 'visited_docs' is the data coming from Python code.
+        // load the python list in the JS variable 'visits_list':
+        const visits_list_q = {{ searched_queries | tojson | safe }};
+        console.log("searched_queries: ")
+        console.log(visits_list_q)
+    </script>
+
+    <h5>Ranking of Visited Queries</h5>
+    <canvas id="dailyVisits_Q" width="400" height="400"></canvas>
+
+
+    <script>
+        // use JS map function top get just the tweet ids as labels
+        const visitsLabels_q = visits_list_q.map(a => "id: " + a[0]);
+        const visitsData_q = visits_list_q.map(a => a[1]);
+        const chartData2 = {
+            labels: visitsLabels_q,
+            datasets: [{
+                label: 'Quries count',
+                // data: [65, 59, 80, 81, 56, 55, 40],
+                data: visitsData_q,
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        };
+
+        const ctx2 = document.getElementById('dailyVisits_Q').getContext('2d');
+
+        // This will render the chart
+        const myChart2 = new Chart(ctx2, {
+            type: 'line',
+            data: chartdata2,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 
 
     <script>
@@ -107,6 +150,10 @@
                 borderWidth: 1
             }]
         };
+
+
+
+
 
         // This will render the chart
         new Chart(document.getElementById("dailyVisits2"), {
