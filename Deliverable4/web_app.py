@@ -112,7 +112,7 @@ def search_form_post():
     session['last_search_query'] = search_query
     search_method = request.form['search-method']
     search_id = analytics_data.save_query_terms(search_query)
-
+    analytics_data.save_search_engine(search_method)
     if(search_method == "TF-IDF"):
         results = search_engine_tfidf.search(search_query, search_id)
     elif(search_method == "Popularity based"):
@@ -231,7 +231,8 @@ def dashboard():
     for doc in visited_docs: visited_docs_json.append(doc.to_json())
     print(analytics_data.fact_queries)
 
-    return render_template('dashboard.html', visited_docs=visited_docs_json, searched_queries=analytics_data.fact_queries)
+    return render_template('dashboard.html', visited_docs=visited_docs_json, searched_queries=analytics_data.fact_queries,
+                            search_method=analytics_data.fact_searcher)
 
 
 @app.route('/sentiment')

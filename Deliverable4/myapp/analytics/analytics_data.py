@@ -15,7 +15,7 @@ class AnalyticsData:
     fact_queries = []
 
     # statistics table 3
-    fact_three = dict([])
+    fact_searcher = []
 
     def save_query_terms(self, terms: str) -> int:
         # Check if terms is already in the list
@@ -29,6 +29,18 @@ class AnalyticsData:
 
         self.fact_queries.sort(key=lambda x: x[1], reverse=True)
         return random.randint(0, 100000)
+    
+    def save_search_engine(self, terms: str) -> int:
+        for idx, (searcher, count) in enumerate(self.fact_searcher):
+            if searcher == terms:
+                self.fact_searcher[idx] = (searcher, count + 1)
+                break
+        else:
+            # If terms is not in the list, add it
+            self.fact_searcher.append((terms, 1))
+
+        self.fact_searcher.sort(key=lambda x: x[1], reverse=True)
+        return 0
 
 
 class ClickedDoc:

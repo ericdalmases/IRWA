@@ -112,7 +112,51 @@
         // This will render the chart
         const myChart2 = new Chart(ctx2, {
             type: 'line',
-            data: chartdata2,
+            data: chartData2,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+    <script>
+        // 'visited_docs' is the data coming from Python code.
+        // load the python list in the JS variable 'visits_list':
+        const searcher_list = {{ search_method | tojson | safe }};
+        console.log("Search methods: ")
+        console.log(searcher_list)
+    </script>
+
+    <h5>Ranking of Search Methods</h5>
+    <canvas id="searcherMethods" width="400" height="400"></canvas>
+
+
+    <script>
+        // use JS map function top get just the tweet ids as labels
+        const searchLabels = searcher_list.map(a => "id: " + a[0]);
+        const searchData = searcher_list.map(a => a[1]);
+        const chartData3 = {
+            labels: searchLabels,
+            datasets: [{
+                label: 'Quries count',
+                // data: [65, 59, 80, 81, 56, 55, 40],
+                data: searchData,
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        };
+
+        const ctx3 = document.getElementById('searcherMethods').getContext('2d');
+
+        // This will render the chart
+        const myChart3 = new Chart(ctx3, {
+            type: 'line',
+            data: chartData3,
             options: {
                 scales: {
                     y: {
