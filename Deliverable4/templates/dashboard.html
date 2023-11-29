@@ -27,34 +27,41 @@
         // 'visited_docs' is the data coming from Python code.
         // load the python list in the JS variable 'visits_list':
         const visits_list = {{ visited_docs | tojson | safe }};
-        console.log("visited docs: ")
-        console.log(visits_list)
+        console.log("visited docs: ");
+        console.log(visits_list);
     </script>
-
+    
     <h5>Ranking of Visited Documents</h5>
     <canvas id="dailyVisits" width="400" height="400"></canvas>
-
+    
     <script>
-        // use JS map function top get just the tweet ids as labels
+        // use JS map function to get just the tweet ids as labels
         const visitsLabels = visits_list.map(a => "id: " + a.doc_id);
         const visitsData = visits_list.map(a => a.counter);
+        // Function to dynamically set bar color based on count
+        const getColor = (value) => {
+            // You can customize the color range based on your preference
+            return value > 3 ? 'rgba(255, 99, 132, 0.8)' : 'rgba(75, 192, 192, 0.8)';
+        };
+    
+        const backgroundColors = visitsData.map(count => getColor(count));
+    
         const chartData1 = {
             labels: visitsLabels,
             datasets: [{
                 label: 'Visits count',
-                // data: [65, 59, 80, 81, 56, 55, 40],
                 data: visitsData,
-                fill: false,
+                backgroundColor: backgroundColors,
                 borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
+                borderWidth: 1
             }]
         };
-
+    
         const ctx1 = document.getElementById('dailyVisits').getContext('2d');
-
+    
         // This will render the chart
         const myChart1 = new Chart(ctx1, {
-            type: 'line',
+            type: 'bar',
             data: chartData1,
             options: {
                 scales: {
@@ -64,8 +71,8 @@
                 }
             }
         });
-
     </script>
+    
 
     <hr>
     <h5>Print Python data for verification with graph above...</h5>
@@ -167,7 +174,10 @@
         });
     </script>
 
-
+        
+    <h5>Ranking of Visited Queries</h5>
+    <canvas id="test1" width="400" height="400"></canvas>
+    <canvas id="test2" width="400" height="400"></canvas>
     <script>
         // another example
         const data2 = {
@@ -200,7 +210,7 @@
 
 
         // This will render the chart
-        new Chart(document.getElementById("dailyVisits2"), {
+        new Chart(document.getElementById("test1"), {
             type: 'bar',
             data: {
                 labels: myLabels,
@@ -248,7 +258,7 @@
     </script>
 
 
-    <canvas id="dailyVisits2" width="400" height="400"></canvas>
+    <canvas id="test" width="400" height="400"></canvas>
 
 
 
