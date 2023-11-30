@@ -16,6 +16,8 @@ class AnalyticsData:
 
     # statistics table 3
     fact_searcher = []
+    
+    fact_terms = []
 
     def save_query_terms(self, terms: str) -> int:
         # Check if terms is already in the list
@@ -28,6 +30,7 @@ class AnalyticsData:
             self.fact_queries.append((terms, 1))
 
         self.fact_queries.sort(key=lambda x: x[1], reverse=True)
+        self.save_individual_terms(terms)
         return random.randint(0, 100000)
     
     def save_search_engine(self, terms: str) -> int:
@@ -41,6 +44,22 @@ class AnalyticsData:
 
         self.fact_searcher.sort(key=lambda x: x[1], reverse=True)
         return 0
+    
+    def save_individual_terms(self, query:str) -> int:
+        for term in query.split(" "):
+            for idx, (existingTerm, count) in enumerate(self.fact_terms):
+                if term == existingTerm:
+                    self.fact_terms[idx] = (term, count + 1)
+                    break
+            else:
+                # If terms is not in the list, add it
+                self.fact_terms.append((term, 1))
+
+            self.fact_terms.sort(key=lambda x: x[1], reverse=True)
+        
+        return 0
+            
+        
 
 
 class ClickedDoc:

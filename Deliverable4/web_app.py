@@ -228,11 +228,12 @@ def dashboard():
     # simulate sort by ranking
     visited_docs.sort(key=lambda doc: doc.counter, reverse=True)
 
+    print('terms_count', analytics_data.fact_terms)
     for doc in visited_docs: visited_docs_json.append(doc.to_json())
     print(analytics_data.fact_queries)
 
     return render_template('dashboard.html', visited_docs=visited_docs_json, searched_queries=analytics_data.fact_queries,
-                            search_method=analytics_data.fact_searcher)
+                           search_method=analytics_data.fact_searcher, searched_terms=analytics_data.fact_terms)
 
 
 @app.route('/sentiment')
