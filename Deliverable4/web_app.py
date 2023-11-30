@@ -1,5 +1,6 @@
 import os
 from json import JSONEncoder
+import json
 
 # pip install httpagentparser
 import httpagentparser  # for getting the user agent as json
@@ -37,7 +38,7 @@ app.session_cookie_name = 'IRWA_SEARCH_ENGINE'
 
 
 # instantiate our in memory persistence
-analytics_data = AnalyticsData()
+analytics_data = AnalyticsData.from_pickle()
 
 # print("current dir", os.getcwd() + "\n")
 # print("__file__", __file__ + "\n")
@@ -145,11 +146,8 @@ def doc_details():
     p2 = int(request.args["param2"])  # transform to Integer
     print("click in id={}".format(clicked_doc_id))
 
+    analytics_data.save_clicked_docs(clicked_doc_id)
     # store data in statistics table 1
-    if clicked_doc_id in analytics_data.fact_clicks.keys():
-        analytics_data.fact_clicks[clicked_doc_id] += 1
-    else:
-        analytics_data.fact_clicks[clicked_doc_id] = 1
 
     print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
     output_tweet = corpus[clicked_doc_id]
@@ -218,22 +216,24 @@ def stats():
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
     visited_docs = []
-    print(analytics_data.fact_clicks.keys())
-    for doc_id in analytics_data.fact_clicks.keys():
+    for doc_id in analytics_data.fact_clicks_stored.keys():
         d: Tweet = corpus[int(doc_id)]
-        doc = ClickedDoc(doc_id, d.description, analytics_data.fact_clicks[doc_id])
+        doc = ClickedDoc(doc_id, d.description, analytics_data.fact_clicks_stored[doc_id])
         visited_docs.append(doc)
 
     visited_docs_json = []
     # simulate sort by ranking
-    visited_docs.sort(key=lambda doc: doc.counter, reverse=True)
-
-    print('terms_count', analytics_data.fact_terms)
     for doc in visited_docs: visited_docs_json.append(doc.to_json())
-    print(analytics_data.fact_queries)
+    visited_docs.sort(key=lambda doc: doc.counter, reverse=True)
+    words = []
+    
+    suma = sum([t[1] for t in analytics_data.fact_terms_stored])
 
-    return render_template('dashboard.html', visited_docs=visited_docs_json, searched_queries=analytics_data.fact_queries,
-                           search_method=analytics_data.fact_searcher, searched_terms=analytics_data.fact_terms)
+    for word in analytics_data.fact_terms_stored:
+        words.append({'word': word[0], 'size': 100*word[1]/suma})
+   
+    return render_template('dashboard.html', visited_docs=visited_docs_json, searched_queries=analytics_data.fact_queries_stored,
+                           search_method=analytics_data.fact_searcher_stored, searched_terms=analytics_data.fact_terms_stored, words=words)
 
 
 @app.route('/sentiment')

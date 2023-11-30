@@ -6,6 +6,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.2/chart.min.js"
             integrity="sha512-tMabqarPtykgDtdtSqCL3uLVM0gS1ZkUAVhRFu1vSEFgvB73niFQWJuvviDyBGBH22Lcau4rHB5p2K2T0Xvr6Q=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+
+    <!-- Load d3-cloud -->
+    <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -32,7 +38,7 @@
     </script>
     
     <h5>Ranking of Visited Documents</h5>
-    <canvas id="dailyVisits" width="400" height="400"></canvas>
+    <canvas id="dailyVisits" width="400" height="200"></canvas>
     
     <script>
         // use JS map function to get just the tweet ids as labels
@@ -93,9 +99,9 @@
         console.log("searched_queries: ")
         console.log(visits_list_q)
     </script>
-
+    <hr>
     <h5>Ranking of Visited Queries</h5>
-    <canvas id="dailyVisits_Q" width="400" height="400"></canvas>
+    <canvas id="dailyVisits_Q" width="400" height="200"></canvas>
 
 
     <script>
@@ -137,9 +143,9 @@
         console.log("Search methods: ")
         console.log(searcher_list)
     </script>
-
+    <hr>
     <h5>Ranking of Search Methods</h5>
-    <canvas id="searcherMethods" width="400" height="400"></canvas>
+    <canvas id="searcherMethods" width="400" height="200"></canvas>
 
 
     <script>
@@ -174,92 +180,50 @@
         });
     </script>
 
-        
-    <h5>Ranking of Visited Queries</h5>
-    <canvas id="test1" width="400" height="400"></canvas>
-    <canvas id="test2" width="400" height="400"></canvas>
+    <hr>
+    <h5>Query term wordcloud</h5>
+    <div id="wordCloud" width="400" height="200"></div>
+
     <script>
-        // another example
-        const data2 = {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        };
 
-
-
-
-
-        // This will render the chart
-        new Chart(document.getElementById("test1"), {
-            type: 'bar',
-            data: {
-                labels: myLabels,
-                datasets: [{
-                    data: [1, 2, 3],
-                    label: "Alberta",
-                    borderColor: "#3e95cd",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "BC",
-                    borderColor: "#8e5ea2",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "Manitoba",
-                    borderColor: "#3cba9f",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "New Brunswick",
-                    borderColor: "#e8c3b9",
-                    fill: false
-                }, {
-                    data: [1, 2, 3],
-                    label: "NL",
-                    borderColor: "#c45850",
-                    fill: false
-                }
-                ]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Some title'
-                },
-                hover: {
-                    mode: 'index',
-                    intersect: true
-                },
-            }
-        });
-
-
-    </script>
-
-
-    <canvas id="test" width="400" height="400"></canvas>
-
+        // List of words
+        var myWords = {{ words|tojson|safe  }};
+        
+        const width = 721;
+        const height = 200;
+        // append the svg object to the body of the page
+        var svg = d3.select("#wordCloud").append("svg").attr("width", width).attr("height", height);
+    
+        // Constructs a new cloud layout instance. It run an algorithm to find the position of words that suits your requirements
+        // Wordcloud features that are different from one word to the other must be here
+        var layout = d3.layout.cloud()
+          .size([width, height])
+          .words(myWords.map(function(d) { return {text: d.word, size:d.size}; }))
+          .padding(5)        //space between words
+          .rotate(function() { return ~~(Math.random() * 2) * 90; })
+          .fontSize(function(d) { return d.size; })      // font size of words
+          .on("end", draw);
+        layout.start();
+        
+        // This function takes the output of 'layout' above and draw the words
+        // Wordcloud features that are THE SAME from one word to the other can be here
+        function draw(words) {
+          svg
+            .append("g")
+              .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+              .selectAll("text")
+                .data(words)
+              .enter().append("text")
+                .style("font-size", function(d) { return d.size; })
+                .style("fill", "#69b3a2")
+                .attr("text-anchor", "middle")
+                .style("font-family", "Impact")
+                .attr("transform", function(d) {
+                  return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function(d) { return d.text; });
+        }
+        </script>
 
 
 {% endblock %}
