@@ -92,7 +92,9 @@ def index():
     # flask server creates a session by persisting a cookie in the user's browser.
     # the 'session' object keeps data between multiple requests
     session['some_var'] = "IRWA 2023 home"
-
+    print('starting')
+    analytics_data.save_time_doc()
+    print('ending')
     user_agent = request.headers.get('User-Agent')
     print("Raw user browser:", user_agent)
 
@@ -118,7 +120,7 @@ def search_form_post():
     search_method = request.form['search-method']
     search_id = analytics_data.save_query_terms(search_query)
     analytics_data.save_search_engine(search_method)
-    
+    analytics_data.save_time_doc()
     current_datetime = datetime.now()
     analytics_data.save_day_week(current_datetime)
 
@@ -155,6 +157,7 @@ def doc_details():
     print(session)
 
     res = session["some_var"]
+    analytics_data.start_time_doc = datetime.now()
 
     print("recovered var from session:", res)
 
@@ -182,7 +185,7 @@ def stats():
     """
 
     docs = []
-
+    analytics_data.save_time_doc()
     for doc_id in analytics_data.fact_clicks:
         row: Tweet = corpus[int(doc_id)]
         count = analytics_data.fact_clicks[doc_id]
@@ -233,6 +236,7 @@ def stats():
 
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
+    analytics_data.save_time_doc()
     visited_docs = []
     for doc_id in analytics_data.fact_clicks_stored.keys():
         d: Tweet = corpus[int(doc_id)]
@@ -254,16 +258,19 @@ def dashboard():
    
     return render_template('dashboard.html', visited_docs=visited_docs_json, searched_queries=analytics_data.fact_queries_stored,
                            search_method=analytics_data.fact_searcher_stored, searched_terms=analytics_data.fact_terms_stored, words=words,
-                           daysWeek=analytics_data.fact_dayWeek_stored, browsers=analytics_data.fact_browser_stored, oss=analytics_data.fact_os_stored)
+                           daysWeek=analytics_data.fact_dayWeek_stored, browsers=analytics_data.fact_browser_stored, oss=analytics_data.fact_os_stored,
+                           time_spent_docs=analytics_data.fact_docTimes_stored)
 
 
 @app.route('/sentiment')
 def sentiment_form():
+    analytics_data.save_time_doc()
     return render_template('sentiment.html')
 
 
 @app.route('/sentiment', methods=['POST'])
 def sentiment_form_post():
+    analytics_data.save_time_doc()
     text = request.form['text']
     nltk.download('vader_lexicon')
     from nltk.sentiment.vader import SentimentIntensityAnalyzer

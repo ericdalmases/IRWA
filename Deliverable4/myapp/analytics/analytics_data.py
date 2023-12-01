@@ -1,5 +1,6 @@
 import json
 import random
+from datetime import datetime
 import pickle
 
 
@@ -23,6 +24,8 @@ class AnalyticsData:
     fact_dayWeek_stored = []
     fact_browser_stored = []
     fact_os_stored = []
+    start_time_doc = None
+    fact_docTimes_stored = []
 
 
 
@@ -151,6 +154,27 @@ class AnalyticsData:
 
         self.to_pickle()
         return 0
+    
+    def save_time_doc(self) ->int:
+        if self.start_time_doc is not None:
+            time_diff = (datetime.now() - self.start_time_doc)
+            time_diff = round(time_diff.total_seconds())
+            time_diff = min(time_diff, 180)
+            print('time diff:', time_diff)
+            for idx, (time, count) in enumerate(self.fact_docTimes_stored):
+                if time == time_diff:
+                    self.fact_docTimes_stored[idx] = (time_diff, count + 1)
+                    break
+            else:
+                self.fact_docTimes_stored.append((time_diff, 1))
+                max_value = max(item[0] for item in self.fact_docTimes_stored)
+                existing_values = dict(self.fact_docTimes_stored)
+                self.fact_docTimes_stored = [(i, existing_values.get(i, 0)) for i in range(1, max_value + 1)]
+            
+            self.fact_docTimes_stored.sort(key=lambda x: x[0], reverse=False)
+            self.to_pickle()
+            self.start_time_doc = None
+        return 0
             
     def to_pickle(self):
         data = {}
@@ -162,6 +186,7 @@ class AnalyticsData:
         data['fact_dayWeek'] = self.fact_dayWeek_stored
         data['fact_browser'] = self.fact_browser_stored
         data['fact_os'] = self.fact_os_stored
+        data['fact_docTimes'] = self.fact_docTimes_stored
 
         with open("./data/session_storage.pkl", 'wb') as f:
             pickle.dump(data, f)
@@ -173,13 +198,15 @@ class AnalyticsData:
             with open("./data/session_storage.pkl", 'rb') as f:
                 loaded_data = pickle.load(f)
             
-            print(loaded_data)
             analytics = AnalyticsData()
             analytics.fact_clicks_stored = loaded_data['fact_clicks']
             analytics.fact_queries_stored = loaded_data['fact_queries']
             analytics.fact_searcher_stored = loaded_data['fact_searcher']
             analytics.fact_terms_stored = loaded_data['fact_terms']
             analytics.fact_dayWeek_stored = loaded_data['fact_dayWeek']
+            analytics.fact_browser_stored = loaded_data['fact_browser']
+            analytics.fact_os_stored = loaded_data['fact_os']
+            analytics.fact_docTimes_stored = loaded_data['fact_docTimes']
 
             return analytics
         except:

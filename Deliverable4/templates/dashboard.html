@@ -417,7 +417,55 @@
                 })
                 .text(function(d) { return d.text; });
         }
-        </script>
+    </script>
+
+    <script>
+        // 'visited_docs' is the data coming from Python code.
+        // load the python list in the JS variable 'visits_list':
+        const docTimes_List = {{ time_spent_docs | tojson | safe }};
+        console.log("Time spent on docs: ");
+        console.log(docTimes_List);
+    </script>
+
+    <h5>Ranking of Visited Documents</h5>
+    <canvas id="docTimesCanv" width="400" height="200"></canvas>
+
+    <script>
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // use JS map function top get just the tweet ids as labels
+        const docTimesLabels = docTimes_List.map(ac => ac[0]);
+        const docTimesData = docTimes_List.map(ac => ac[1]);
+
+        const colors6 = docTimesData.map(() => getRandomColor());
+
+        const chartData7 = {
+            labels: docTimesLabels,
+            datasets: [{
+                label: 'Seconds ',
+                data: docTimesData,
+                fill: false,
+                backgroundColor: "rgb(75, 192, 192)",
+                borderColor: colors6,
+                tension: 0.1
+            }]
+        };
+
+        const ctx7 = document.getElementById('docTimesCanv').getContext('2d');
+
+        // This will render the chart
+        const myChart7 = new Chart(ctx7, {
+            type: 'bar',
+            data: chartData7
+        });
+    </script>
 
 
 {% endblock %}
