@@ -105,17 +105,30 @@
 
 
     <script>
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
         // use JS map function top get just the tweet ids as labels
         const visitsLabels_q = visits_list_q.map(a => "id: " + a[0]);
         const visitsData_q = visits_list_q.map(a => a[1]);
+
+        const colors = visitsData_q.map(() => getRandomColor());
+
         const chartData2 = {
             labels: visitsLabels_q,
             datasets: [{
-                label: 'Quries count',
+                label: 'Queries count',
                 // data: [65, 59, 80, 81, 56, 55, 40],
                 data: visitsData_q,
                 fill: false,
-                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: colors,
+                borderColor: colors,
                 tension: 0.1
             }]
         };
@@ -145,13 +158,26 @@
     </script>
     <hr>
     <h5>Ranking of Search Methods</h5>
-    <canvas id="searcherMethods" width="400" height="200"></canvas>
+    <canvas id="searcherMethods" width="200" height="100"></canvas>
 
 
     <script>
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
         // use JS map function top get just the tweet ids as labels
         const searchLabels = searcher_list.map(a => "id: " + a[0]);
         const searchData = searcher_list.map(a => a[1]);
+
+        const colors2 = searchData.map(() => getRandomColor());
+
         const chartData3 = {
             labels: searchLabels,
             datasets: [{
@@ -159,7 +185,8 @@
                 // data: [65, 59, 80, 81, 56, 55, 40],
                 data: searchData,
                 fill: false,
-                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: colors2,
+                borderColor: colors2,
                 tension: 0.1
             }]
         };
@@ -168,17 +195,61 @@
 
         // This will render the chart
         const myChart3 = new Chart(ctx3, {
-            type: 'line',
+            type: 'doughnut',
             data: chartData3,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
         });
     </script>
+
+
+    <script>
+
+        const dayWeek_list = {{ daysWeek | tojson | safe }};
+        console.log("Searches by day of the Week: ")
+        console.log(dayWeek_list)
+    </script>
+
+    <hr>
+    <h5>Number of Searchs by day of the Week: </h5>
+    <canvas id="dayWeekCanv" width="200" height="100"></canvas>
+
+    <script>
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // use JS map function top get just the tweet ids as labels
+        const days_week = dayWeek_list.map(ac => ac[0]);
+        const dayWeek_data = dayWeek_list.map(ac => ac[1]);
+
+        const colors3 = searchData.map(() => getRandomColor());
+
+        const chartData4 = {
+            labels: days_week,
+            datasets: [{
+                label: 'Day of the Week',
+                data: dayWeek_data,
+                fill: false,
+                backgroundColor: colors3,
+                borderColor: colors3,
+                tension: 0.1
+            }]
+        };
+
+        const ctx4 = document.getElementById('dayWeekCanv').getContext('2d');
+
+        // This will render the chart
+        const myChart4 = new Chart(ctx4, {
+            type: 'doughnut',
+            data: chartData4
+        });
+    </script>
+
 
     <hr>
     <h5>Query term wordcloud</h5>

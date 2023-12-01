@@ -19,6 +19,8 @@ class AnalyticsData:
     fact_searcher = []
     fact_searcher_stored = []
     fact_terms_stored = []
+    
+    fact_dayWeek_stored = []
 
 
 
@@ -99,6 +101,26 @@ class AnalyticsData:
         
         self.to_pickle()
         return 0
+    
+    def save_day_week(self, current_datetime: str) ->int:
+        num_day_week = current_datetime.weekday()
+        days_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        day_week = days_week[num_day_week]
+
+        for idx, (day, count) in enumerate(self.fact_dayWeek_stored):
+            if day == day_week:
+                self.fact_dayWeek_stored[idx] = (day_week, count + 1)
+                break
+        else:
+            # If terms is not in the list, add it
+            self.fact_dayWeek_stored.append((day_week, 1))
+
+        self.fact_dayWeek_stored.sort(key=lambda x: x[1], reverse=True)
+
+        self.to_pickle()
+        return 0
+        
+        return 0
             
     def to_pickle(self):
         data = {}
@@ -107,6 +129,7 @@ class AnalyticsData:
         data['fact_queries'] = self.fact_queries_stored
         data['fact_searcher'] = self.fact_searcher_stored
         data['fact_terms'] = self.fact_terms_stored
+        data['fact_dayWeek'] = self.fact_dayWeek_stored
 
         with open("./data/session_storage.pkl", 'wb') as f:
             pickle.dump(data, f)
@@ -124,6 +147,7 @@ class AnalyticsData:
             analytics.fact_queries_stored = loaded_data['fact_queries']
             analytics.fact_searcher_stored = loaded_data['fact_searcher']
             analytics.fact_terms_stored = loaded_data['fact_terms']
+            analytics.fact_dayWeek_stored = loaded_data['fact_dayWeek']
 
             return analytics
         except:

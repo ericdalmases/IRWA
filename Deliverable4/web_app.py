@@ -114,6 +114,10 @@ def search_form_post():
     search_method = request.form['search-method']
     search_id = analytics_data.save_query_terms(search_query)
     analytics_data.save_search_engine(search_method)
+    
+    current_datetime = datetime.now()
+    analytics_data.save_day_week(current_datetime)
+
     if(search_method == "TF-IDF"):
         results = search_engine_tfidf.search(search_query, search_id)
     elif(search_method == "Popularity based"):
@@ -231,9 +235,12 @@ def dashboard():
 
     for word in analytics_data.fact_terms_stored:
         words.append({'word': word[0], 'size': 100*word[1]/suma})
+        
+    print(analytics_data.fact_dayWeek_stored)
    
     return render_template('dashboard.html', visited_docs=visited_docs_json, searched_queries=analytics_data.fact_queries_stored,
-                           search_method=analytics_data.fact_searcher_stored, searched_terms=analytics_data.fact_terms_stored, words=words)
+                           search_method=analytics_data.fact_searcher_stored, searched_terms=analytics_data.fact_terms_stored, words=words,
+                           daysWeek=analytics_data.fact_dayWeek_stored)
 
 
 @app.route('/sentiment')
