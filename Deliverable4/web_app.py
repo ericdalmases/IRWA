@@ -173,10 +173,13 @@ def stats():
 
     # simulate sort by ranking
     docs.sort(key=lambda doc: doc.count, reverse=True)
-
-    browser = request.headers.get('User-Agent')
-    os = request.user_agent.platform
-
+    
+    user_agent = request.headers.get('User-Agent')
+    agent = httpagentparser.detect(user_agent)
+    print(f"agente: {agent}")
+    os = agent['os']['name']
+    browser = agent['browser']['name']
+    print(f"THE OS: {os}")
     current_datetime = datetime.now()
     # Get current time of the day
     current_time = current_datetime.strftime('%H:%M:%S')
