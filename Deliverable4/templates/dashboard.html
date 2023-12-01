@@ -158,7 +158,7 @@
     </script>
     <hr>
     <h5>Ranking of Search Methods</h5>
-    <canvas id="searcherMethods" width="200" height="100"></canvas>
+    <canvas id="searcherMethods" width="300" height="300"></canvas>
 
 
     <script>
@@ -197,6 +197,12 @@
         const myChart3 = new Chart(ctx3, {
             type: 'doughnut',
             data: chartData3,
+            options: {
+                responsive: false, // Set to false to control the size manually
+                maintainAspectRatio: false, // Set to false to allow the chart to exceed the canvas size
+                width: 300, // Set the width of the chart
+                height: 300, // Set the height of the chart
+            }
         });
     </script>
 
@@ -210,7 +216,7 @@
 
     <hr>
     <h5>Number of Searchs by day of the Week: </h5>
-    <canvas id="dayWeekCanv" width="200" height="100"></canvas>
+    <canvas id="dayWeekCanv" width="300" height="300"></canvas>
 
     <script>
 
@@ -246,7 +252,124 @@
         // This will render the chart
         const myChart4 = new Chart(ctx4, {
             type: 'doughnut',
-            data: chartData4
+            data: chartData4,
+            options: {
+                responsive: false, // Set to false to control the size manually
+                maintainAspectRatio: false, // Set to false to allow the chart to exceed the canvas size
+                width: 300, // Set the width of the chart
+                height: 300, // Set the height of the chart
+            }
+        });
+    </script>
+
+    <script>
+
+        const browser_List = {{ browsers | tojson | safe }};
+        console.log("Users by browsers: ")
+        console.log(browser_List)
+    </script>
+
+    <hr>
+    <h5>Number of Users by browser: </h5>
+    <canvas id="browserCanv" width="300" height="300"></canvas>
+
+    <script>
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // use JS map function top get just the tweet ids as labels
+        const brows = browser_List.map(ac => ac[0]);
+        const browsers_data = browser_List.map(ac => ac[1]);
+
+        const colors4 = browsers_data.map(() => getRandomColor());
+
+        const chartData5 = {
+            labels: brows,
+            datasets: [{
+                label: 'Browser',
+                data: browsers_data,
+                fill: false,
+                backgroundColor: colors4,
+                borderColor: colors4,
+                tension: 0.1
+            }]
+        };
+
+        const ctx5 = document.getElementById('browserCanv').getContext('2d');
+
+        // This will render the chart
+        const myChart5 = new Chart(ctx5, {
+            type: 'doughnut',
+            data: chartData5,
+            options: {
+                responsive: false, // Set to false to control the size manually
+                maintainAspectRatio: false, // Set to false to allow the chart to exceed the canvas size
+                width: 300, // Set the width of the chart
+                height: 300, // Set the height of the chart
+            }
+        });
+    </script>
+
+
+    <script>
+
+        const os_List = {{ oss | tojson | safe }};
+        console.log("Users by operating system: ")
+        console.log(os_List)
+    </script>
+
+    <hr>
+    <h5>Number of Users by operating system: </h5>
+    <canvas id="osCanv" width="300" height="300"></canvas>
+
+    <script>
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // use JS map function top get just the tweet ids as labels
+        const os = os_List.map(ac => ac[0]);
+        const os_data = os_List.map(ac => ac[1]);
+
+        const colors5 = os_data.map(() => getRandomColor());
+
+        const chartData6 = {
+            labels: os,
+            datasets: [{
+                label: 'Operating System',
+                data: os_data,
+                fill: false,
+                backgroundColor: colors5,
+                borderColor: colors5,
+                tension: 0.1
+            }]
+        };
+
+        const ctx6 = document.getElementById('osCanv').getContext('2d');
+
+        // This will render the chart
+        const myChart6 = new Chart(ctx6, {
+            type: 'doughnut',
+            data: chartData6,
+            options: {
+                responsive: false, // Set to false to control the size manually
+                maintainAspectRatio: false, // Set to false to allow the chart to exceed the canvas size
+                width: 300, // Set the width of the chart
+                height: 300, // Set the height of the chart
+            }
         });
     </script>
 

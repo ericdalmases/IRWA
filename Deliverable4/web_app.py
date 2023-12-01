@@ -109,6 +109,10 @@ def index():
 
 @app.route('/search', methods=['POST'])
 def search_form_post():
+    user_agent = request.headers.get('User-Agent')
+    agent = httpagentparser.detect(user_agent)
+    os = agent['os']['name']
+    browser = agent['browser']['name']
     search_query = request.form['search-query']
     session['last_search_query'] = search_query
     search_method = request.form['search-method']
@@ -117,6 +121,16 @@ def search_form_post():
     
     current_datetime = datetime.now()
     analytics_data.save_day_week(current_datetime)
+
+    try:
+        ip_info = requests.get('https://api64.ipify.org?format=json').json()
+        ip_address = ip_info['ip']
+        analytics_data.save_browser(browser, ip_address)
+        analytics_data.save_os(os, ip_address)
+    except Exception as e:
+        print('Error fetching IP information:', e)
+        analytics_data.save_browser(browser, 0)
+        analytics_data.save_os(os, 0)
 
     if(search_method == "TF-IDF"):
         results = search_engine_tfidf.search(search_query, search_id)
@@ -190,7 +204,6 @@ def stats():
 
     # Get current date
     current_date = current_datetime.strftime('%d/%m/%Y')
-    print(request.remote_addr)
     ip_address = "Unknown"
     country = "Unknown"
     city = "Unknown"
@@ -203,8 +216,6 @@ def stats():
         city = ip_info['location']['city']
     except Exception as e:
         print('Error fetching IP information:', e)
-
-    print(analytics_data.fact_queries)
 
     return render_template(
         'stats.html', 
@@ -243,7 +254,7 @@ def dashboard():
    
     return render_template('dashboard.html', visited_docs=visited_docs_json, searched_queries=analytics_data.fact_queries_stored,
                            search_method=analytics_data.fact_searcher_stored, searched_terms=analytics_data.fact_terms_stored, words=words,
-                           daysWeek=analytics_data.fact_dayWeek_stored)
+                           daysWeek=analytics_data.fact_dayWeek_stored, browsers=analytics_data.fact_browser_stored, oss=analytics_data.fact_os_stored)
 
 
 @app.route('/sentiment')

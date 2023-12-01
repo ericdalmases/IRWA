@@ -21,6 +21,8 @@ class AnalyticsData:
     fact_terms_stored = []
     
     fact_dayWeek_stored = []
+    fact_browser_stored = []
+    fact_os_stored = []
 
 
 
@@ -119,7 +121,35 @@ class AnalyticsData:
 
         self.to_pickle()
         return 0
-        
+    
+    def save_browser(self, browser: str, ip) ->int:
+        for idx, (b, count, ip_address) in enumerate(self.fact_browser_stored):
+            if b == browser:
+                if ip_address != ip:
+                    self.fact_browser_stored[idx] = (b, count + 1, ip)
+                break
+        else:
+            # If terms is not in the list, add it
+            self.fact_browser_stored.append((browser, 1, ip))
+
+        self.fact_browser_stored.sort(key=lambda x: x[1], reverse=True)
+
+        self.to_pickle()
+        return 0
+    
+    def save_os(self, os: str, ip) ->int:
+        for idx, (operating_system, count, ip_address) in enumerate(self.fact_os_stored):
+            if operating_system == os:
+                if ip_address != ip:
+                    self.fact_os_stored[idx] = (operating_system, count + 1, ip)
+                break
+        else:
+            # If terms is not in the list, add it
+            self.fact_os_stored.append((os, 1, ip))
+
+        self.fact_os_stored.sort(key=lambda x: x[1], reverse=True)
+
+        self.to_pickle()
         return 0
             
     def to_pickle(self):
@@ -130,6 +160,8 @@ class AnalyticsData:
         data['fact_searcher'] = self.fact_searcher_stored
         data['fact_terms'] = self.fact_terms_stored
         data['fact_dayWeek'] = self.fact_dayWeek_stored
+        data['fact_browser'] = self.fact_browser_stored
+        data['fact_os'] = self.fact_os_stored
 
         with open("./data/session_storage.pkl", 'wb') as f:
             pickle.dump(data, f)
