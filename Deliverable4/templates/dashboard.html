@@ -215,7 +215,7 @@
     </script>
 
     <hr>
-    <h5>Number of Searchs by day of the Week: </h5>
+    <h5>Number of Searches by day of the Week: </h5>
     <canvas id="dayWeekCanv" width="300" height="300"></canvas>
 
     <script>
@@ -427,7 +427,7 @@
         console.log(docTimes_List);
     </script>
 
-    <h5>Ranking of Visited Documents</h5>
+    <h5>Time Spent in tweet ranking</h5>
     <canvas id="docTimesCanv" width="400" height="200"></canvas>
 
     <script>
@@ -463,7 +463,26 @@
         // This will render the chart
         const myChart7 = new Chart(ctx7, {
             type: 'bar',
-            data: chartData7
+            data: chartData7,
+            options: {
+                scales: {
+                    x: {
+                        type: 'category',
+                        labels: docTimesLabels,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Seconds in tweet'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Count'
+                        }
+                    }
+                }
+            }
         });
     </script>
 
