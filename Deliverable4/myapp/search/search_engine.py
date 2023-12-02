@@ -21,6 +21,11 @@ class SearchEngineTfIdf:
 
         doc_scores = search_in_corpus(search_query, self.index, self.tf, self.idf, self.title_index)
 
+        # AND condition of the search
+        query_tokens = TextProcessor.process(search_query)
+        query_tokens = set(query_tokens)
+        filtered_docs_scores = [pair for pair in doc_scores if len(query_tokens.intersection(set(TextProcessor.process(self.corpus[pair[1]].description)))) >= len(query_tokens)]
+
         res = []
         
         for pair in doc_scores:
@@ -45,9 +50,14 @@ class SearchEngineOurScore:
 
         doc_scores = search_custom(search_query, self.index, self.custom_scores)
 
+        # AND condition of the search
+        query_tokens = TextProcessor.process(search_query)
+        query_tokens = set(query_tokens)
+        filtered_docs_scores = [pair for pair in doc_scores if len(query_tokens.intersection(set(TextProcessor.process(self.corpus[pair[1]].description)))) >= len(query_tokens)]
+
         res = []
         
-        for pair in doc_scores:
+        for pair in filtered_docs_scores:
             docId = pair[1]
             score = pair[0]
             item: Tweet = self.corpus[docId]
@@ -84,13 +94,18 @@ class SearchEngineWord2Vec:
         doc_scores = []
         res = []
 
-        for docId in self.corpus:
+        # AND condition of the search
+        query_tokens = set(query_tokens)
+        filtered_docs = [docId for docId in self.corpus if len(query_tokens.intersection(set(    TextProcessor.process(self.corpus[docId].description)))) >= len(query_tokens)]
+
+        for docId in filtered_docs:
             tweet_embedded = average_vector(self.corpus[docId].description, self.model) # We compute the embedding of the tweet
             doc_scores.append([
                 cosine_similarity(np.array(query_embedded).reshape(1, -1), np.array(tweet_embedded).reshape(1, -1))[0][0], docId])
         
-        doc_scores = sorted(doc_scores, key=lambda x: x[0], reverse=True)[:20]
+        doc_scores = sorted(doc_scores, key=lambda x: x[0], reverse=True)
         print(doc_scores)
+
 
         for pair in doc_scores:
             docId = pair[1]

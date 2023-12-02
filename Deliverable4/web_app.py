@@ -249,10 +249,17 @@ def dashboard():
     visited_docs.sort(key=lambda doc: doc.counter, reverse=True)
     words = []
     
-    suma = sum([t[1] for t in analytics_data.fact_terms_stored])
+    original_values = [t[1] for t in analytics_data.fact_terms_stored]
+    min_value = min(original_values)
+    max_value = max(original_values)
 
-    for word in analytics_data.fact_terms_stored:
-        words.append({'word': word[0], 'size': 100*word[1]/suma})
+    scaled_values = [
+        ((value - min_value) / (max_value - min_value)) * (100 - 10) + 10
+        for value in original_values
+    ]
+
+    for i, word in enumerate(analytics_data.fact_terms_stored):
+        words.append({'word': word[0], 'size': scaled_values[i]})
         
     print(analytics_data.fact_dayWeek_stored)
    
