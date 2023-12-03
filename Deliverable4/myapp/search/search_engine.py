@@ -3,7 +3,7 @@ from myapp.search.objects import ResultItem, Tweet
 from myapp.search.algorithms import search_in_corpus, search_custom, TextProcessor
 
 import gensim
-from gensim.models import Word2Vec, KeyedVectors
+from gensim.models import Word2Vec
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 

@@ -1,15 +1,13 @@
 from collections import defaultdict
-from array import array
-import math
 import numpy as np
 import collections
 from numpy import linalg as la
 import nltk
-from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
-nltk.download('stopwords')
 from nltk.corpus import stopwords
 import regex as re
+
+nltk.download('stopwords')
 
 class TextProcessor():
   @staticmethod

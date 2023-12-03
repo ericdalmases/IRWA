@@ -2,7 +2,6 @@ import pandas as pd
 
 from myapp.core.utils import load_json_file
 from myapp.search.objects import Tweet
-from myapp.search.algorithms import search_in_corpus
 
 _corpus = {}
 
